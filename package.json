@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://ton-username.github.io/gadzola",
+  "homepage": "https://Gregoir30.github.io/gadzola/",
 
   "scripts": {
     "dev": "vite",
@@ -16,7 +16,7 @@
 
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
-    "postbuild": "cp dist/index.html dist/404.html"
+    "postbuild": "node scripts/copy-404.mjs"
   },
 
   "dependencies": {
