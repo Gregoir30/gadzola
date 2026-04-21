@@ -1,0 +1,16 @@
+project_id = "hgliabijllyozgstiuhk"
+
+[functions.admin-create-user]
+verify_jwt = false
+
+[functions.bootstrap-admin]
+verify_jwt = false
+
+[functions.ai-insights]
+verify_jwt = false
+
+[functions.generate-receipt]
+verify_jwt = false
+
+[functions.generate-monthly-carnet]
+verify_jwt = false
