@@ -53,13 +53,13 @@
     --surface: 0 0% 100%;
     --surface-muted: 240 15% 97%;
 
-    --sidebar-background: 240 30% 10%;
-    --sidebar-foreground: 240 20% 90%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 30% 10%;
     --sidebar-primary: 260 85% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 25% 16%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 240 25% 18%;
+    --sidebar-accent: 260 60% 96%;
+    --sidebar-accent-foreground: 260 85% 35%;
+    --sidebar-border: 240 15% 90%;
     --sidebar-ring: 260 85% 60%;
 
     --gradient-primary: linear-gradient(135deg, hsl(260 85% 60%) 0%, hsl(280 90% 65%) 50%, hsl(220 90% 60%) 100%);
@@ -67,6 +67,10 @@
     --gradient-success: linear-gradient(135deg, hsl(152 70% 45%) 0%, hsl(165 70% 50%) 100%);
     --gradient-gold: linear-gradient(135deg, hsl(38 95% 55%) 0%, hsl(28 95% 60%) 100%);
     --gradient-card: linear-gradient(180deg, hsl(240 30% 12% / 0.6) 0%, hsl(240 30% 8% / 0.4) 100%);
+    --gradient-mesh:
+      radial-gradient(at 20% 20%, hsl(260 85% 72% / 0.18) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, hsl(220 90% 68% / 0.14) 0px, transparent 50%),
+      radial-gradient(at 80% 80%, hsl(285 90% 70% / 0.1) 0px, transparent 50%);
 
     --shadow-elegant: 0 20px 60px -20px hsl(260 85% 30% / 0.4);
     --shadow-card: 0 1px 3px hsl(240 30% 5% / 0.1), 0 1px 2px hsl(240 30% 5% / 0.06);
@@ -75,7 +79,7 @@
   }
 
   /* DARK = mode par défaut de l'app */
-  .dark, html {
+  html.dark {
     --background: 240 50% 5%;
     --foreground: 240 10% 96%;
 
@@ -148,6 +152,10 @@
   }
 
   html {
+    color-scheme: light;
+  }
+
+  html.dark {
     color-scheme: dark;
   }
 
