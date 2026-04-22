@@ -76,6 +76,53 @@ export type Database = {
           },
         ]
       }
+      collector_locations: {
+        Row: {
+          accuracy: number | null
+          collector_id: string
+          created_at: string
+          heading: number | null
+          id: string
+          latitude: number
+          longitude: number
+          recorded_at: string
+          speed: number | null
+          source: string
+        }
+        Insert: {
+          accuracy?: number | null
+          collector_id: string
+          created_at?: string
+          heading?: number | null
+          id?: string
+          latitude: number
+          longitude: number
+          recorded_at?: string
+          speed?: number | null
+          source?: string
+        }
+        Update: {
+          accuracy?: number | null
+          collector_id?: string
+          created_at?: string
+          heading?: number | null
+          id?: string
+          latitude?: number
+          longitude?: number
+          recorded_at?: string
+          speed?: number | null
+          source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collector_locations_collector_id_fkey"
+            columns: ["collector_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           balance: number

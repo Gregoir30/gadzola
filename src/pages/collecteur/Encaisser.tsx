@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+﻿import { useState, useRef, useEffect } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,7 @@ import {
 import { QRScanner } from "@/components/QRScanner";
 import { PAYMENT_METHODS, formatFCFA, formatDate } from "@/lib/format";
 import { motion, AnimatePresence } from "framer-motion";
+import { enqueueOfflineTransaction, loadOfflineTransactions, syncOfflineTransactions } from "@/lib/offlineTransactions";
 
 const QUICK_AMOUNTS = [500, 1000, 2000, 5000, 10000];
 
@@ -49,11 +50,33 @@ export default function Encaisser() {
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState<{ ref: string; amount: number } | null>(null);
+  const [offlineCount, setOfflineCount] = useState(0);
 
   const { data: clientsData, isLoading: loadingClients } = useClients({
     search,
     pageSize: 15,
   });
+
+  useEffect(() => {
+    setOfflineCount(loadOfflineTransactions().length);
+
+    const sync = async () => {
+      const result = await syncOfflineTransactions();
+      setOfflineCount(result.remaining);
+      if (result.synced > 0) {
+        toast({ title: "Synchronisation terminÃ©e", description: `${result.synced} transaction(s) hors-ligne envoyÃ©e(s).` });
+      }
+    };
+
+    void sync();
+
+    const handleOnline = () => {
+      void sync();
+    };
+
+    window.addEventListener("online", handleOnline);
+    return () => window.removeEventListener("online", handleOnline);
+  }, []);
 
   // Fetch specific client details + goals + last tx
   const { data: clientDetails, isLoading: loadingDetails } = useQuery({
@@ -125,7 +148,7 @@ export default function Encaisser() {
         _new_data: { context: "direct_scan_in_encaisser" }
       });
 
-      toast({ title: "Client identifié !", description: "Consultez ses objectifs et entrez le montant." });
+      toast({ title: "Client identifiÃ© !", description: "Consultez ses objectifs et entrez le montant." });
       
       // Autofocus amount field after dialog closing animation
       setTimeout(() => {
@@ -150,21 +173,56 @@ export default function Encaisser() {
       toast({ title: "Montant invalide", variant: "destructive" });
       return;
     }
+
     setIsSubmitting(true);
-    const { data: txId, error } = await supabase.rpc("record_transaction", {
-      _client_id: clientId,
-      _amount: amt,
-      _method: method as "cash" | "mobile_money_orange" | "mobile_money_mtn" | "mobile_money_wave" | "mobile_money_moov",
-      _notes: notes || null,
-    });
-    
-    if (error) {
+    const payload = {
+      client_id: clientId,
+      amount: amt,
+      method: method as "cash" | "mobile_money_orange" | "mobile_money_mtn" | "mobile_money_wave" | "mobile_money_moov",
+      notes: notes || null,
+    };
+
+    const resetForm = () => {
+      setClientId("");
+      setAmount("");
+      setNotes("");
+      setMethod("cash");
+      setOfflineCount(loadOfflineTransactions().length);
+    };
+
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      const queued = enqueueOfflineTransaction(payload);
+      setSuccess({ ref: queued.id, amount: amt });
+      resetForm();
       setIsSubmitting(false);
-      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+      toast({
+        title: "Transaction mise en attente",
+        description: "Elle sera synchronisée automatiquement dès que la connexion revient.",
+      });
+      void queryClient.invalidateQueries({ queryKey: ["clients"] });
       return;
     }
-    
-    // Récupérer la référence
+
+    const { data: txId, error } = await supabase.rpc("record_transaction", {
+      _client_id: payload.client_id,
+      _amount: payload.amount,
+      _method: payload.method,
+      _notes: payload.notes,
+    });
+
+    if (error) {
+      const queued = enqueueOfflineTransaction(payload);
+      setSuccess({ ref: queued.id, amount: amt });
+      resetForm();
+      setIsSubmitting(false);
+      toast({
+        title: "Connexion instable",
+        description: "La transaction a été enregistrée localement et sera envoyée plus tard.",
+      });
+      void queryClient.invalidateQueries({ queryKey: ["clients"] });
+      return;
+    }
+
     const { data: tx } = await supabase
       .from("transactions")
       .select("reference")
@@ -172,13 +230,9 @@ export default function Encaisser() {
       .single();
 
     setSuccess({ ref: tx?.reference ?? "—", amount: amt });
-    setClientId("");
-    setAmount("");
-    setNotes("");
-    setMethod("cash");
+    resetForm();
     setIsSubmitting(false);
-    
-    // Refresh clients data (especially balance)
+
     void queryClient.invalidateQueries({ queryKey: ["clients"] });
   };
 
@@ -189,17 +243,25 @@ export default function Encaisser() {
           <h1 className="text-2xl md:text-3xl font-bold">Encaisser un paiement</h1>
           <p className="text-muted-foreground">Sélectionnez un client et enregistrez la transaction.</p>
         </div>
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="rounded-full border border-border px-2.5 py-1 text-muted-foreground">
+            {typeof navigator !== "undefined" && navigator.onLine ? "En ligne" : "Hors ligne"}
+          </span>
+          <span className="rounded-full border border-border px-2.5 py-1 text-muted-foreground">
+            {offlineCount} transaction{offlineCount > 1 ? "s" : ""} en attente
+          </span>
+        </div>
 
         {success && (
           <Card className="border-success bg-success-soft/40">
             <CardContent className="p-5 flex items-center gap-3">
               <CheckCircle2 className="h-6 w-6 text-success shrink-0" />
               <div className="flex-1">
-                <div className="font-semibold">Transaction enregistrée</div>
+                <div className="font-semibold">Transaction enregistrÃ©e</div>
                 <div className="text-sm text-muted-foreground">
-                  {formatFCFA(success.amount)} — Référence{" "}
+                  {formatFCFA(success.amount)} â€” RÃ©fÃ©rence{" "}
                   <span className="font-mono">{success.ref}</span>. Notification WhatsApp
-                  programmée pour le client.
+                  programmÃ©e pour le client.
                 </div>
               </div>
               <Button variant="ghost" size="sm" onClick={() => setSuccess(null)}>
@@ -238,7 +300,7 @@ export default function Encaisser() {
                       <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                          placeholder="Nom ou téléphone…"
+                          placeholder="Nom ou tÃ©lÃ©phoneâ€¦"
                           className="pl-9 bg-background/50"
                           value={search}
                           onChange={(e) => setSearch(e.target.value)}
@@ -248,10 +310,10 @@ export default function Encaisser() {
                         {loadingClients ? (
                           <div className="p-8 flex flex-col items-center justify-center gap-2 text-muted-foreground">
                             <Loader2 className="h-5 w-5 animate-spin" />
-                            <span className="text-xs">Chargement des clients…</span>
+                            <span className="text-xs">Chargement des clientsâ€¦</span>
                           </div>
                         ) : clients.length === 0 ? (
-                          <p className="p-3 text-sm text-muted-foreground text-center">Aucun client trouvé.</p>
+                          <p className="p-3 text-sm text-muted-foreground text-center">Aucun client trouvÃ©.</p>
                         ) : (
                           clients.map((c) => (
                             <button
@@ -262,7 +324,7 @@ export default function Encaisser() {
                             >
                               <div>
                                 <div className="font-medium">{c.full_name}</div>
-                                <div className="text-xs text-muted-foreground font-mono">{c.phone ?? "—"}</div>
+                                <div className="text-xs text-muted-foreground font-mono">{c.phone ?? "â€”"}</div>
                               </div>
                               <span className="text-xs font-semibold px-2 py-1 bg-muted rounded-full">
                                 {formatFCFA(c.balance)}
@@ -338,7 +400,7 @@ export default function Encaisser() {
                               {clientDetails?.lastTx ? (
                                 <span>Dernier: <span className="font-bold text-foreground">{formatFCFA(clientDetails.lastTx.amount)}</span> le {formatDate(clientDetails.lastTx.date)}</span>
                               ) : (
-                                <span>Aucune transaction récente</span>
+                                <span>Aucune transaction rÃ©cente</span>
                               )}
                             </div>
                             
@@ -404,7 +466,7 @@ export default function Encaisser() {
                   </AnimatePresence>
                 </div>
                 <div className="space-y-2">
-                  <Label>Méthode</Label>
+                  <Label>MÃ©thode</Label>
                   <Select value={method} onValueChange={setMethod}>
                     <SelectTrigger>
                       <SelectValue />
@@ -442,3 +504,8 @@ export default function Encaisser() {
     </AppShell>
   );
 }
+
+
+
+
+

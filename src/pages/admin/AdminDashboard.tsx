@@ -4,7 +4,7 @@ import { StatCard } from "@/components/StatCard";
 import { ActivityHeatmap } from "@/components/ActivityHeatmap";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Wallet, Users, UserCheck, Bell, Loader2, Shield } from "lucide-react";
+import { Wallet, Users, UserCheck, Bell, Loader2, Shield, TrendingUp, Clock3, MapPin } from "lucide-react";
 import { formatFCFA, formatDate, methodLabel } from "@/lib/format";
 import {
   ResponsiveContainer,
@@ -49,6 +49,15 @@ interface RawTx {
   client_id: string;
 }
 
+interface CollectorLocation {
+  id: string;
+  collector_id: string;
+  latitude: number;
+  longitude: number;
+  accuracy: number | null;
+  recorded_at: string;
+}
+
 const PIE_COLORS = [
   "hsl(var(--primary))",
   "hsl(var(--success))",
@@ -62,6 +71,7 @@ export default function AdminDashboard() {
   const [recent, setRecent] = useState<RecentTx[]>([]);
   const [allTxs, setAllTxs] = useState<RawTx[]>([]);
   const [collectorNames, setCollectorNames] = useState<Map<string, string>>(new Map());
+  const [locations, setLocations] = useState<CollectorLocation[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -79,10 +89,24 @@ export default function AdminDashboard() {
       supabase.from("audit_logs").select("id, action, entity_type, created_at, user_id").order("created_at", { ascending: false }).limit(6),
     ]);
 
+    const { data: rawLocations } = await supabase
+      .from("collector_locations")
+      .select("id, collector_id, latitude, longitude, accuracy, recorded_at")
+      .order("recorded_at", { ascending: false })
+      .limit(20);
+
     const txList: RawTx[] = (txs ?? []).map((t) => ({ ...t, amount: Number(t.amount) }));
     const totalAmount = txList.reduce((sum, t) => sum + t.amount, 0);
 
     setAllTxs(txList);
+    setLocations((rawLocations ?? []).map((loc) => ({
+      id: loc.id,
+      collector_id: loc.collector_id,
+      latitude: Number(loc.latitude),
+      longitude: Number(loc.longitude),
+      accuracy: loc.accuracy != null ? Number(loc.accuracy) : null,
+      recorded_at: loc.recorded_at,
+    })));
     setStats({
       totalAmount,
       txCount: txList.length,
@@ -188,6 +212,15 @@ export default function AdminDashboard() {
     }));
   }, [allTxs]);
 
+  const reportSummary = useMemo(() => {
+    const averageTicket = stats.txCount > 0 ? stats.totalAmount / stats.txCount : 0;
+    const dominantMethod = [...methodData].sort((a, b) => b.value - a.value)[0] ?? null;
+    const latestLocation = locations[0] ?? null;
+    const latestCollectorName = latestLocation ? collectorNames.get(latestLocation.collector_id) ?? "—" : "—";
+
+    return { averageTicket, dominantMethod, latestLocation, latestCollectorName };
+  }, [collectorNames, locations, methodData, stats.totalAmount, stats.txCount]);
+
   return (
     <AppShell>
       <div className="space-y-6 max-w-7xl">
@@ -201,6 +234,43 @@ export default function AdminDashboard() {
           <StatCard label="Transactions" value={stats.txCount} icon={Bell} tone="success" />
           <StatCard label="Collecteurs actifs" value={stats.collectorCount} icon={UserCheck} tone="gold" />
           <StatCard label="Clients" value={stats.clientCount} icon={Users} />
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-primary" /> Ticket moyen
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-2xl font-bold">{formatFCFA(reportSummary.averageTicket)}</CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Bell className="h-4 w-4 text-success" /> Méthode dominante
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-1">
+              <div className="text-2xl font-bold">{reportSummary.dominantMethod?.name ?? "—"}</div>
+              <div className="text-xs text-muted-foreground">
+                {reportSummary.dominantMethod ? formatFCFA(reportSummary.dominantMethod.value) : "Aucune donnée"}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Clock3 className="h-4 w-4 text-gold" /> Dernier point GPS
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-1">
+              <div className="text-sm font-semibold">{reportSummary.latestCollectorName}</div>
+              <div className="text-xs text-muted-foreground">
+                {reportSummary.latestLocation ? formatDate(reportSummary.latestLocation.recorded_at) : "Aucun point"}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <ActivityHeatmap txs={allTxs.map((t) => ({ created_at: t.created_at, amount: t.amount }))} />
@@ -401,6 +471,51 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </div>
+
+        <Card className="border-none shadow-premium overflow-hidden">
+          <CardHeader className="bg-muted/30 pb-4">
+            <CardTitle className="flex items-center gap-2 text-base font-semibold">
+              <MapPin className="h-4 w-4 text-primary" /> Validation GPS des collectes
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr] p-6">
+            <div className="overflow-hidden rounded-2xl border border-border">
+              {reportSummary.latestLocation ? (
+                <iframe
+                  title="Carte GPS administrateur"
+                  width="100%"
+                  height="320"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${reportSummary.latestLocation.longitude - 0.01}%2C${reportSummary.latestLocation.latitude - 0.01}%2C${reportSummary.latestLocation.longitude + 0.01}%2C${reportSummary.latestLocation.latitude + 0.01}&layer=mapnik&marker=${reportSummary.latestLocation.latitude}%2C${reportSummary.latestLocation.longitude}`}
+                />
+              ) : (
+                <div className="flex h-[320px] items-center justify-center text-sm text-muted-foreground">
+                  Aucun point GPS disponible pour le moment.
+                </div>
+              )}
+            </div>
+            <div className="space-y-3">
+              {locations.slice(0, 5).map((location) => (
+                <div key={location.id} className="rounded-xl border border-border bg-background/60 p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="font-semibold">{collectorNames.get(location.collector_id) ?? "Collecteur"}</div>
+                    <div className="text-[10px] text-muted-foreground">{formatDate(location.recorded_at)}</div>
+                  </div>
+                  <div className="mt-1 text-xs text-muted-foreground font-mono">
+                    {location.latitude.toFixed(5)}, {location.longitude.toFixed(5)}
+                  </div>
+                  <div className="mt-1 text-[10px] text-muted-foreground">
+                    Précision: {location.accuracy ? `${Math.round(location.accuracy)} m` : "—"}
+                  </div>
+                </div>
+              ))}
+              {locations.length === 0 && (
+                <p className="text-sm text-muted-foreground">Aucun trajet n’a encore été synchronisé.</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </AppShell>
   );
