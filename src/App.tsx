@@ -26,6 +26,7 @@ import ClientDashboard from "./pages/client/ClientDashboard";
 import ClientTransactions from "./pages/client/ClientTransactions";
 import ClientPayer from "./pages/client/ClientPayer";
 import ClientCarnet from "./pages/client/ClientCarnet";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -154,6 +155,15 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["client"]}>
                   <ClientPayer />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
                 </ProtectedRoute>
               }
             />

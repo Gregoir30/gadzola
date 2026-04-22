@@ -10,6 +10,7 @@ import {
   BookOpen,
   Trophy,
   Settings,
+  UserCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -55,11 +56,12 @@ const roleLabels: Record<AppRole, string> = {
 };
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { primaryRole, user } = useAuth();
-  const { branding, theme, toggleTheme } = useBranding();
+  const { primaryRole, user, profile } = useAuth();
+  const { branding } = useBranding();
   const navigate = useNavigate();
 
-  const items = primaryRole ? navByRole[primaryRole] : [];
+  const items = primaryRole ? [...navByRole[primaryRole], { to: "/profile", label: "Mon profil", icon: UserCircle2 }] : [];
+  const displayName = profile?.full_name ?? user?.user_metadata?.full_name ?? user?.email ?? "Utilisateur";
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -110,7 +112,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="relative border-t border-sidebar-border p-3 space-y-1">
-          <div className="px-3 py-2 text-xs text-sidebar-foreground/60 truncate">{user?.email}</div>
+          <Link to="/profile" className="block rounded-xl px-3 py-2 transition-colors hover:bg-sidebar-accent/60">
+            <div className="text-sm font-semibold text-sidebar-foreground truncate">{displayName}</div>
+            <div className="text-xs text-sidebar-foreground/60 truncate">{user?.email}</div>
+          </Link>
           <ThemeToggle className="mt-2" />
           <Button
             variant="ghost"

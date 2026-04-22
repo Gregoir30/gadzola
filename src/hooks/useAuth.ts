@@ -4,9 +4,17 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type AppRole = "admin" | "collecteur" | "client";
 
+export interface UserProfile {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+}
+
 export interface AuthState {
   session: Session | null;
   user: User | null;
+  profile: UserProfile | null;
   roles: AppRole[];
   primaryRole: AppRole | null;
   loading: boolean;
@@ -15,6 +23,7 @@ export interface AuthState {
 export function useAuth(): AuthState {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -25,9 +34,12 @@ export function useAuth(): AuthState {
       setUser(newSession?.user ?? null);
       if (newSession?.user) {
         // defer to avoid deadlock
-        setTimeout(() => fetchRoles(newSession.user.id), 0);
+        setTimeout(() => {
+          void fetchUserData(newSession.user);
+        }, 0);
       } else {
         setRoles([]);
+        setProfile(null);
         setLoading(false);
       }
     });
@@ -37,7 +49,7 @@ export function useAuth(): AuthState {
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
       if (currentSession?.user) {
-        fetchRoles(currentSession.user.id);
+        void fetchUserData(currentSession.user);
       } else {
         setLoading(false);
       }
@@ -46,9 +58,28 @@ export function useAuth(): AuthState {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  const fetchRoles = async (userId: string) => {
-    const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
-    setRoles((data ?? []).map((r) => r.role as AppRole));
+  const fetchUserData = async (currentUser: User) => {
+    const [{ data: roleData }, { data: profileData }] = await Promise.all([
+      supabase.from("user_roles").select("role").eq("user_id", currentUser.id),
+      supabase.from("profiles").select("id, full_name, email, phone").eq("id", currentUser.id).maybeSingle(),
+    ]);
+
+    setRoles((roleData ?? []).map((r) => r.role as AppRole));
+    setProfile(
+      profileData
+        ? {
+            id: profileData.id,
+            full_name: profileData.full_name ?? currentUser.user_metadata?.full_name ?? null,
+            email: profileData.email ?? currentUser.email ?? null,
+            phone: profileData.phone ?? null,
+          }
+        : {
+            id: currentUser.id,
+            full_name: currentUser.user_metadata?.full_name ?? currentUser.email ?? null,
+            email: currentUser.email ?? null,
+            phone: null,
+          },
+    );
     setLoading(false);
   };
 
@@ -60,5 +91,5 @@ export function useAuth(): AuthState {
     ? "client"
     : null;
 
-  return { session, user, roles, primaryRole, loading };
+  return { session, user, profile, roles, primaryRole, loading };
 }
