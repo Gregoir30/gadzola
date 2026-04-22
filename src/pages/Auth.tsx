@@ -84,12 +84,12 @@ export default function Auth() {
       {/* Visual side */}
       <div className="relative hidden lg:block overflow-hidden">
         <img src={heroShopkeeper} alt="Gadzola" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/70 via-background/50 to-background" />
-        <div className="absolute inset-0 gradient-mesh opacity-50" />
+        <div className="absolute inset-0 bg-primary/20" />
+        <div className="absolute inset-0 bg-primary/10 opacity-50" />
 
         <div className="relative h-full flex flex-col justify-between p-12 text-foreground">
           <Link to="/" className="flex items-center gap-2.5 w-fit">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-primary shadow-glow">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-glow">
               <ShieldCheck className="h-5 w-5 text-white" />
             </div>
             <span className="font-display text-xl font-bold">Gadzola</span>
@@ -106,7 +106,7 @@ export default function Auth() {
               <span>La fintech qui révolutionne la collecte africaine</span>
             </div>
             <h1 className="font-display text-4xl xl:text-5xl font-bold leading-tight">
-              Bienvenue dans <span className="text-gradient">votre carnet</span> intelligent.
+              Bienvenue dans <span className="text-primary">votre carnet</span> intelligent.
             </h1>
             <p className="text-foreground/80 text-base leading-relaxed">
               Suivez chaque paiement, atteignez vos objectifs, débloquez des badges, et recevez
@@ -133,7 +133,7 @@ export default function Auth() {
           className="w-full max-w-md"
         >
           <div className="lg:hidden mb-8 flex items-center gap-2.5 justify-center">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-primary shadow-glow">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-glow">
               <ShieldCheck className="h-5 w-5 text-white" />
             </div>
             <span className="font-display text-2xl font-bold">Gadzola</span>
@@ -165,7 +165,7 @@ export default function Auth() {
                     <Label htmlFor="password">Mot de passe</Label>
                     <Input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} className="h-11 bg-background/60" />
                   </div>
-                  <Button type="submit" className="w-full h-11 gradient-primary border-0 shadow-glow text-base" disabled={loading}>
+                  <Button type="submit" className="w-full h-11 bg-primary border-0 shadow-glow text-base text-primary-foreground hover:bg-primary/90" disabled={loading}>
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Se connecter
                   </Button>
@@ -189,7 +189,7 @@ export default function Auth() {
                     <Label htmlFor="password-s">Mot de passe (min 8)</Label>
                     <Input id="password-s" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className="h-11 bg-background/60" />
                   </div>
-                  <Button type="submit" className="w-full h-11 gradient-primary border-0 shadow-glow text-base" disabled={loading}>
+                  <Button type="submit" className="w-full h-11 bg-primary border-0 shadow-glow text-base text-primary-foreground hover:bg-primary/90" disabled={loading}>
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Créer mon compte
                   </Button>

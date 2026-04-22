@@ -59,9 +59,9 @@ export default function AdminLeaderboard() {
   const monthMax = useMemo(() => rows[0]?.monthTotal || 1, [rows]);
 
   const podiumStyle = (rank: number) => {
-    if (rank === 0) return { color: "from-yellow-400 to-amber-500", h: "h-44", icon: Trophy, badge: "🥇" };
-    if (rank === 1) return { color: "from-slate-300 to-slate-400", h: "h-36", icon: Medal, badge: "🥈" };
-    return { color: "from-amber-700 to-orange-700", h: "h-28", icon: Award, badge: "🥉" };
+    if (rank === 0) return { color: "bg-amber-500", h: "h-44", icon: Trophy, badge: "🥇" };
+    if (rank === 1) return { color: "bg-slate-300", h: "h-36", icon: Medal, badge: "🥈" };
+    return { color: "bg-orange-700", h: "h-28", icon: Award, badge: "🥉" };
   };
 
   return (
@@ -105,7 +105,7 @@ export default function AdminLeaderboard() {
                           <div className="font-bold text-sm md:text-base truncate w-full">{r.name}</div>
                           <div className="text-xs text-muted-foreground">{formatFCFA(r.monthTotal)}</div>
                         </div>
-                        <div className={`w-full ${s.h} rounded-t-lg bg-gradient-to-b ${s.color} shadow-elegant flex items-start justify-center pt-3`}>
+                        <div className={`w-full ${s.h} rounded-t-lg ${s.color} shadow-elegant flex items-start justify-center pt-3`}>
                           <Icon className="h-7 w-7 text-white drop-shadow" />
                         </div>
                       </motion.div>
@@ -134,10 +134,7 @@ export default function AdminLeaderboard() {
                       transition={{ delay: i * 0.03 }}
                       className="relative overflow-hidden rounded-lg border bg-card p-3"
                     >
-                      <div
-                        className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary/10 to-primary/0"
-                        style={{ width: `${pct}%` }}
-                      />
+                      <div className="absolute inset-y-0 left-0 bg-primary/10" style={{ width: `${pct}%` }} />
                       <div className="relative flex items-center gap-3">
                         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted font-bold text-sm">
                           {i + 1}

@@ -44,7 +44,7 @@ export function BrandLogo({ className, iconClassName, size = "md" }: BrandLogoPr
   return (
     <div
       className={cn(
-        "flex items-center justify-center rounded-xl gradient-primary shadow-glow",
+        "flex items-center justify-center rounded-xl bg-primary shadow-glow",
         SIZES[size],
         className,
       )}

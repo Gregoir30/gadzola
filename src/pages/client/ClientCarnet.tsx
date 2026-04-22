@@ -244,7 +244,7 @@ export default function ClientCarnet() {
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="flex items-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-4 py-2 text-white shadow-lg"
+          className="flex items-center gap-2 rounded-full bg-orange-500 px-4 py-2 text-white shadow-lg"
           >
             <Flame className="h-5 w-5" />
             <span className="font-bold">{streak}</span>
@@ -265,7 +265,7 @@ export default function ClientCarnet() {
         {/* Navigation mois + Objectif */}
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="overflow-hidden border-2 border-primary/10">
-            <div className="bg-gradient-to-br from-primary to-primary-glow p-1">
+            <div className="bg-primary p-1">
               <div className="bg-card rounded-md">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
@@ -287,7 +287,7 @@ export default function ClientCarnet() {
                     key={monthTotal}
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="text-4xl font-bold gradient-primary bg-clip-text text-transparent"
+                    className="text-4xl font-bold text-primary"
                   >
                     {formatFCFA(monthTotal)}
                   </motion.div>
@@ -351,7 +351,7 @@ export default function ClientCarnet() {
 
         {/* Actions */}
         <div className="flex flex-wrap gap-2">
-          <Button onClick={generateInsight} disabled={insightLoading} className="gradient-primary">
+          <Button onClick={generateInsight} disabled={insightLoading} className="bg-primary text-primary-foreground hover:bg-primary/90">
             {insightLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
             Coach IA
           </Button>
@@ -369,9 +369,9 @@ export default function ClientCarnet() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
             >
-              <Card className="border-primary/30 bg-gradient-to-br from-accent to-card">
+              <Card className="border-primary/30 bg-accent">
                 <CardContent className="p-5 flex gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full gradient-primary text-primary-foreground">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
                     <Sparkles className="h-5 w-5" />
                   </div>
                   <div className="flex-1">
@@ -405,7 +405,7 @@ export default function ClientCarnet() {
               </div>
             ) : (
               <div className="relative pl-6 md:pl-8">
-                <div className="absolute left-2 md:left-3 top-2 bottom-2 w-0.5 bg-gradient-to-b from-primary via-primary/40 to-transparent" />
+                <div className="absolute left-2 md:left-3 top-2 bottom-2 w-0.5 bg-primary/40" />
                 {monthTxs.map((t, i) => (
                   <motion.div
                     key={t.id}

@@ -82,7 +82,7 @@ export default function ClientDashboard() {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-3xl p-6 md:p-8 gradient-primary text-white shadow-elegant"
+          className="relative overflow-hidden rounded-3xl p-6 md:p-8 bg-primary text-primary-foreground shadow-elegant"
         >
           <div className="absolute inset-0 grid-pattern opacity-20" />
           <div className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-white/20 blur-3xl" />
@@ -99,16 +99,16 @@ export default function ClientDashboard() {
         </motion.div>
 
         <div className="grid gap-4 sm:grid-cols-3">
-          <StatTile icon={History} label="Transactions" value={txs.length} hint="Total enregistré" gradient="from-cyan-500 to-blue-500" />
-          <StatTile icon={Flame} label="Streak" value={`${streak} mois`} hint="Mois consécutifs" gradient="from-orange-500 to-red-500" />
-          <StatTile icon={TrendingUp} label="Dernier paiement" value={txs[0] ? formatFCFA(txs[0].amount) : "—"} hint={txs[0] ? formatDate(txs[0].created_at) : "Aucun"} gradient="from-green-500 to-emerald-500" />
+          <StatTile icon={History} label="Transactions" value={txs.length} hint="Total enregistré" tone="sky" />
+          <StatTile icon={Flame} label="Streak" value={`${streak} mois`} hint="Mois consécutifs" tone="orange" />
+          <StatTile icon={TrendingUp} label="Dernier paiement" value={txs[0] ? formatFCFA(txs[0].amount) : "—"} hint={txs[0] ? formatDate(txs[0].created_at) : "Aucun"} tone="emerald" />
         </div>
 
         {/* CTA carnet */}
         <Card className="glass border-primary/30 overflow-hidden">
           <CardContent className="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl gradient-primary shadow-glow shrink-0">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-glow shrink-0">
                 <BookOpen className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -116,7 +116,7 @@ export default function ClientDashboard() {
                 <div className="text-sm text-muted-foreground">Objectifs, timeline, coach IA, reçu PDF</div>
               </div>
             </div>
-            <Button asChild className="gradient-primary border-0 shadow-glow">
+            <Button asChild className="bg-primary border-0 shadow-glow text-primary-foreground hover:bg-primary/90">
               <Link to="/client/carnet">Ouvrir <Sparkles className="ml-1 h-4 w-4" /></Link>
             </Button>
           </CardContent>
@@ -151,7 +151,7 @@ export default function ClientDashboard() {
                     className="flex items-center justify-between gap-3 rounded-xl glass p-3 hover:border-primary/40 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-lg gradient-success flex items-center justify-center shrink-0">
+                      <div className="h-10 w-10 rounded-lg bg-success flex items-center justify-center shrink-0">
                         <Wallet className="h-5 w-5 text-white" />
                       </div>
                       <div>
@@ -174,13 +174,19 @@ export default function ClientDashboard() {
 }
 
 function StatTile({
-  icon: Icon, label, value, hint, gradient,
-}: { icon: React.ComponentType<{ className?: string }>; label: string; value: React.ReactNode; hint: string; gradient: string }) {
+  icon: Icon, label, value, hint, tone,
+}: { icon: React.ComponentType<{ className?: string }>; label: string; value: React.ReactNode; hint: string; tone: "sky" | "orange" | "emerald" }) {
+  const toneClasses = {
+    sky: "bg-sky-500 text-white",
+    orange: "bg-orange-500 text-white",
+    emerald: "bg-emerald-500 text-white",
+  }[tone];
+
   return (
     <motion.div whileHover={{ y: -3 }}>
       <Card className="glass border-border/40 overflow-hidden">
         <CardContent className="p-4 flex items-center gap-3">
-          <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} text-white shadow-lg shrink-0`}>
+          <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${toneClasses} shadow-lg shrink-0`}>
             <Icon className="h-5 w-5" />
           </div>
           <div className="min-w-0">

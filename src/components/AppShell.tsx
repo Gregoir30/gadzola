@@ -71,7 +71,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-background">
       <aside className="hidden w-64 shrink-0 flex-col bg-sidebar text-sidebar-foreground md:flex border-r border-sidebar-border relative">
-        <div className="absolute inset-0 gradient-mesh opacity-30 pointer-events-none" />
+        <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
 
         <Link to="/" className="relative flex items-center gap-2.5 px-6 py-5 border-b border-sidebar-border">
           <BrandLogo size="md" />
@@ -93,7 +93,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 cn(
                   "relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all group",
                   isActive
-                    ? "bg-gradient-to-r from-primary/30 to-primary/10 text-foreground shadow-glow"
+                    ? "bg-primary/15 text-foreground shadow-glow"
                     : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
                 )
               }
@@ -101,7 +101,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               {({ isActive }) => (
                 <>
                   {isActive && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full gradient-primary" />
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-primary" />
                   )}
                   <item.icon className="h-4 w-4" />
                   {item.label}
@@ -154,7 +154,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 cn(
                   "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all",
                   isActive
-                    ? "gradient-primary text-primary-foreground shadow-glow"
+                    ? "bg-primary text-primary-foreground shadow-glow"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )
               }

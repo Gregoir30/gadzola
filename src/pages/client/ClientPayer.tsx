@@ -70,7 +70,7 @@ export default function ClientPayer() {
                 </div>
               ) : clientId ? (
                 <div className="relative group">
-                  <div className="absolute -inset-4 bg-gradient-to-tr from-primary/20 to-primary/0 rounded-[2rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute -inset-4 bg-primary/10 rounded-[2rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="relative bg-white p-6 rounded-[2rem] shadow-glow border-4 border-primary/10">
                     <QRCodeSVG 
                       value={`GZ_CLIENT:${clientId}`} 

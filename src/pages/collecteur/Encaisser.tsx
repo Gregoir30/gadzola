@@ -285,7 +285,7 @@ export default function Encaisser() {
                         </div>
                         <CardContent className="p-4 flex items-center justify-between relative">
                           <div className="flex items-center gap-4">
-                            <div className="h-12 w-12 rounded-xl gradient-primary flex items-center justify-center text-white shadow-lg">
+                            <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg">
                               <Sparkles className="h-6 w-6" />
                             </div>
                             <div>

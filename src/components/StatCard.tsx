@@ -11,10 +11,10 @@ interface StatCardProps {
 
 export function StatCard({ label, value, hint, icon: Icon, tone = "default" }: StatCardProps) {
   const toneClasses = {
-    default: "bg-gradient-to-br from-cyan-500 to-blue-500 text-white",
-    success: "gradient-success text-white",
-    gold: "gradient-gold text-foreground",
-    primary: "gradient-primary text-white",
+    default: "bg-sky-500 text-white",
+    success: "bg-emerald-500 text-white",
+    gold: "bg-amber-500 text-foreground",
+    primary: "bg-violet-500 text-white",
   }[tone];
 
   return (

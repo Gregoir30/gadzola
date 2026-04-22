@@ -36,9 +36,7 @@ export function BadgesGrid({ badges }: { badges: Badge[] }) {
               >
                 <div
                   className={`relative mx-auto h-14 w-14 rounded-2xl flex items-center justify-center ${
-                    b.unlocked
-                      ? `bg-gradient-to-br ${b.gradient} shadow-lg`
-                      : "bg-muted"
+                    b.unlocked ? `${b.gradient} shadow-lg` : "bg-muted"
                   }`}
                 >
                   {b.unlocked ? (
@@ -50,7 +48,7 @@ export function BadgesGrid({ badges }: { badges: Badge[] }) {
                     <motion.div
                       animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
                       transition={{ duration: 2, repeat: Infinity }}
-                      className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${b.gradient} blur-xl -z-10`}
+                      className={`absolute inset-0 rounded-2xl ${b.gradient} blur-xl -z-10 opacity-40`}
                     />
                   )}
                 </div>
@@ -58,8 +56,8 @@ export function BadgesGrid({ badges }: { badges: Badge[] }) {
                 <div className="text-[10px] text-muted-foreground mt-0.5 line-clamp-2">{b.description}</div>
                 {!b.unlocked && b.progress !== undefined && b.progress > 0 && (
                   <div className="mt-2 h-1 rounded-full bg-muted overflow-hidden">
-                    <div
-                      className={`h-full bg-gradient-to-r ${b.gradient}`}
+                  <div
+                      className={`h-full ${b.gradient}`}
                       style={{ width: `${b.progress}%` }}
                     />
                   </div>

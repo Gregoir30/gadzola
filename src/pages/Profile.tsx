@@ -70,7 +70,7 @@ export default function Profile() {
   return (
     <AppShell>
       <div className="max-w-5xl space-y-6">
-        <div className="flex flex-col gap-4 rounded-3xl gradient-primary p-6 text-white shadow-elegant md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4 rounded-3xl bg-primary p-6 text-primary-foreground shadow-elegant md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
               <UserCircle2 className="h-8 w-8" />
@@ -138,7 +138,7 @@ export default function Profile() {
                 >
                   Annuler
                 </Button>
-                <Button onClick={handleSave} disabled={saving} className="gradient-primary border-0 shadow-glow">
+                <Button onClick={handleSave} disabled={saving} className="bg-primary border-0 shadow-glow text-primary-foreground hover:bg-primary/90">
                   {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Enregistrer
                 </Button>
@@ -153,7 +153,7 @@ export default function Profile() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl gradient-primary text-white font-bold">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold">
                     {(profile?.full_name ?? user?.email ?? "U")[0].toUpperCase()}
                   </div>
                   <div className="min-w-0">

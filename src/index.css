@@ -62,15 +62,12 @@
     --sidebar-border: 240 15% 90%;
     --sidebar-ring: 260 85% 60%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(260 85% 60%) 0%, hsl(280 90% 65%) 50%, hsl(220 90% 60%) 100%);
-    --gradient-hero: radial-gradient(ellipse at top, hsl(260 85% 25%) 0%, hsl(240 60% 8%) 60%, hsl(240 50% 5%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(152 70% 45%) 0%, hsl(165 70% 50%) 100%);
-    --gradient-gold: linear-gradient(135deg, hsl(38 95% 55%) 0%, hsl(28 95% 60%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(240 30% 12% / 0.6) 0%, hsl(240 30% 8% / 0.4) 100%);
-    --gradient-mesh:
-      radial-gradient(at 20% 20%, hsl(260 85% 72% / 0.18) 0px, transparent 50%),
-      radial-gradient(at 80% 0%, hsl(220 90% 68% / 0.14) 0px, transparent 50%),
-      radial-gradient(at 80% 80%, hsl(285 90% 70% / 0.1) 0px, transparent 50%);
+    --gradient-primary: hsl(260 85% 60%);
+    --gradient-hero: hsl(240 20% 97%);
+    --gradient-success: hsl(152 70% 45%);
+    --gradient-gold: hsl(38 95% 55%);
+    --gradient-card: hsl(240 30% 96% / 0.8);
+    --gradient-mesh: hsl(260 85% 60% / 0.08);
 
     --shadow-elegant: 0 20px 60px -20px hsl(260 85% 30% / 0.4);
     --shadow-card: 0 1px 3px hsl(240 30% 5% / 0.1), 0 1px 2px hsl(240 30% 5% / 0.06);
@@ -130,14 +127,12 @@
     --sidebar-border: 240 30% 14%;
     --sidebar-ring: 265 90% 65%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(265 90% 60%) 0%, hsl(285 95% 65%) 50%, hsl(220 95% 60%) 100%);
-    --gradient-hero: radial-gradient(ellipse at top, hsl(265 80% 25%) 0%, hsl(240 60% 7%) 55%, hsl(240 50% 4%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(152 70% 45%) 0%, hsl(170 80% 50%) 100%);
-    --gradient-gold: linear-gradient(135deg, hsl(38 95% 55%) 0%, hsl(20 95% 60%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(240 35% 11% / 0.8) 0%, hsl(240 40% 7% / 0.6) 100%);
-    --gradient-mesh: radial-gradient(at 20% 20%, hsl(265 90% 50% / 0.25) 0px, transparent 50%),
-                     radial-gradient(at 80% 0%, hsl(220 90% 50% / 0.2) 0px, transparent 50%),
-                     radial-gradient(at 80% 80%, hsl(285 90% 50% / 0.15) 0px, transparent 50%);
+    --gradient-primary: hsl(265 90% 65%);
+    --gradient-hero: hsl(240 35% 9%);
+    --gradient-success: hsl(152 70% 50%);
+    --gradient-gold: hsl(38 95% 60%);
+    --gradient-card: hsl(240 35% 11% / 0.8);
+    --gradient-mesh: hsl(265 90% 65% / 0.12);
 
     --shadow-elegant: 0 20px 60px -20px hsl(265 90% 30% / 0.5);
     --shadow-card: 0 1px 0 hsl(240 30% 100% / 0.04) inset, 0 4px 20px hsl(240 50% 2% / 0.4);
@@ -162,8 +157,7 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
-    background-image: var(--gradient-mesh);
-    background-attachment: fixed;
+    background-color: hsl(var(--background));
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -172,11 +166,11 @@
 }
 
 @layer utilities {
-  .gradient-primary { background: var(--gradient-primary); }
-  .gradient-hero { background: var(--gradient-hero); }
-  .gradient-success { background: var(--gradient-success); }
-  .gradient-gold { background: var(--gradient-gold); }
-  .gradient-mesh { background-image: var(--gradient-mesh); }
+  .gradient-primary { background-color: var(--gradient-primary); }
+  .gradient-hero { background-color: var(--gradient-hero); }
+  .gradient-success { background-color: var(--gradient-success); }
+  .gradient-gold { background-color: var(--gradient-gold); }
+  .gradient-mesh { background-color: var(--gradient-mesh); }
 
   .shadow-elegant { box-shadow: var(--shadow-elegant); }
   .shadow-card-soft { box-shadow: var(--shadow-card); }
@@ -198,17 +192,11 @@
   }
 
   .text-gradient {
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: var(--gradient-primary);
   }
 
   .text-gradient-gold {
-    background: var(--gradient-gold);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: var(--gradient-gold);
   }
 
   .ring-glow {

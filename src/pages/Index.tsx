@@ -35,7 +35,7 @@ export default function Index() {
       <header className="sticky top-0 z-50 border-b border-border/40 glass">
         <div className="container mx-auto flex items-center justify-between py-4">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl gradient-primary shadow-glow">
+            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-glow">
               <ShieldCheck className="h-5 w-5 text-white" />
               <div className="absolute inset-0 rounded-xl bg-white/20 blur-md -z-10" />
             </div>
@@ -47,7 +47,7 @@ export default function Index() {
             <a href="#securite" className="hover:text-foreground transition-colors">Sécurité</a>
             <a href="#temoignages" className="hover:text-foreground transition-colors">Avis</a>
           </nav>
-          <Button asChild className="gradient-primary border-0 shadow-glow hover:opacity-90">
+          <Button asChild className="bg-primary border-0 shadow-glow hover:bg-primary/90 text-primary-foreground">
             <Link to="/auth">Se connecter <ArrowRight className="ml-1 h-4 w-4" /></Link>
           </Button>
         </div>
@@ -55,7 +55,7 @@ export default function Index() {
 
       {/* HERO */}
       <section className="relative">
-        <div className="absolute inset-0 gradient-mesh opacity-60 pointer-events-none" />
+        <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
         <div className="absolute top-32 left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-primary/20 blur-[120px] pointer-events-none" />
 
         <div className="container mx-auto py-20 md:py-28 grid lg:grid-cols-2 gap-12 items-center relative">
@@ -76,7 +76,7 @@ export default function Index() {
             <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tighter">
               Votre argent,
               <br />
-              <span className="text-gradient">dans un carnet</span>
+              <span className="text-primary">dans un carnet</span>
               <br />
               vraiment intelligent.
             </h1>
@@ -88,7 +88,7 @@ export default function Index() {
             </p>
 
             <div className="flex flex-wrap gap-3">
-              <Button asChild size="lg" className="gradient-primary border-0 shadow-glow text-base h-12 px-7 hover:scale-105 transition-transform">
+              <Button asChild size="lg" className="bg-primary border-0 shadow-glow text-base h-12 px-7 hover:bg-primary/90 transition-transform text-primary-foreground">
                 <Link to="/auth">
                   Démarrer gratuitement <ArrowRight className="ml-1 h-4 w-4" />
                 </Link>
@@ -101,7 +101,7 @@ export default function Index() {
             <div className="flex items-center gap-6 pt-4">
               <div className="flex -space-x-2">
                 {[1,2,3,4].map((i) => (
-                  <div key={i} className="h-9 w-9 rounded-full border-2 border-background bg-gradient-to-br from-primary to-primary-glow" />
+                  <div key={i} className="h-9 w-9 rounded-full border-2 border-background bg-primary" />
                 ))}
               </div>
               <div className="text-sm">
@@ -120,7 +120,7 @@ export default function Index() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="relative"
           >
-            <div className="absolute -inset-8 bg-gradient-to-br from-primary/40 via-primary-glow/20 to-transparent blur-3xl" />
+            <div className="absolute -inset-8 bg-primary/15 blur-3xl" />
 
             <div className="relative rounded-3xl overflow-hidden shadow-elegant border border-border/40 ring-glow">
               <img
@@ -130,7 +130,7 @@ export default function Index() {
                 height={1080}
                 className="w-full h-auto object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-background/80" />
             </div>
 
             {/* Floating cards */}
@@ -140,7 +140,7 @@ export default function Index() {
               className="absolute -left-4 top-12 glass-strong rounded-2xl p-4 shadow-elegant w-56 hidden md:block"
             >
               <div className="flex items-center gap-2 mb-2">
-                <div className="h-8 w-8 rounded-lg gradient-success flex items-center justify-center">
+                <div className="h-8 w-8 rounded-lg bg-success flex items-center justify-center">
                   <Check className="h-4 w-4 text-white" />
                 </div>
                 <span className="text-xs font-semibold text-success">Paiement reçu</span>
@@ -160,7 +160,7 @@ export default function Index() {
               </div>
               <div className="text-xs text-muted-foreground mb-2">Octobre — 50 000 FCFA</div>
               <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                <div className="h-full w-full gradient-success" />
+                <div className="h-full w-full bg-success" />
               </div>
             </motion.div>
           </motion.div>
@@ -176,7 +176,7 @@ export default function Index() {
               { v: "99,9%", l: "Disponibilité" },
             ].map((s) => (
               <div key={s.l} className="text-center">
-                <div className="font-display text-2xl md:text-3xl font-bold text-gradient">{s.v}</div>
+                <div className="font-display text-2xl md:text-3xl font-bold text-primary">{s.v}</div>
                 <div className="text-xs md:text-sm text-muted-foreground mt-1">{s.l}</div>
               </div>
             ))}
@@ -189,7 +189,7 @@ export default function Index() {
         <div className="text-center max-w-2xl mx-auto mb-14">
           <Badge variant="outline" className="border-primary/40 text-primary mb-4">3 interfaces, 1 plateforme</Badge>
           <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 tracking-tight">
-            Pensé pour <span className="text-gradient">chaque acteur</span> de la collecte.
+            Pensé pour <span className="text-primary">chaque acteur</span> de la collecte.
           </h2>
           <p className="text-muted-foreground text-lg">
             Du collecteur sur le terrain à l'administrateur au bureau, en passant par le client
@@ -203,28 +203,28 @@ export default function Index() {
             badge="Collecteur"
             title="Encaisser en 5 secondes"
             text="Scan, montant, validation. La transaction est notifiée au client et tracée à vie."
-            gradient="from-primary to-primary-glow"
+            gradient="bg-violet-500"
           />
           <FeatureCard
             icon={BookOpen}
             badge="Client"
             title="Mon carnet animé"
             text="Timeline mensuelle, objectif, streak, badges. Voir mon argent grandir devient un jeu."
-            gradient="from-pink-500 to-orange-500"
+            gradient="bg-fuchsia-500"
           />
           <FeatureCard
             icon={BarChart3}
             badge="Admin"
             title="Pilotage en temps réel"
             text="Heatmap d'activité, classement gamifié, insights IA. La performance, sous contrôle."
-            gradient="from-cyan-500 to-blue-500"
+            gradient="bg-sky-500"
           />
         </div>
       </section>
 
       {/* CARNET — image showcase */}
       <section id="carnet" className="relative py-24">
-        <div className="absolute inset-0 gradient-mesh opacity-40 pointer-events-none" />
+        <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
         <div className="container mx-auto relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -234,7 +234,7 @@ export default function Index() {
               transition={{ duration: 0.7 }}
               className="relative order-2 lg:order-1"
             >
-              <div className="absolute -inset-8 bg-gradient-to-tr from-success/30 via-primary/20 to-transparent blur-3xl" />
+              <div className="absolute -inset-8 bg-success/15 blur-3xl" />
               <div className="relative rounded-3xl overflow-hidden shadow-elegant border border-border/40">
                 <img
                   src={heroPayment}
@@ -250,7 +250,7 @@ export default function Index() {
             <div className="space-y-6 order-1 lg:order-2">
               <Badge variant="outline" className="border-success/40 text-success">Nouveauté</Badge>
               <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight">
-                Le <span className="text-gradient">carnet d'épargne</span> qui motive vos clients.
+                Le <span className="text-primary">carnet d'épargne</span> qui motive vos clients.
               </h2>
               <p className="text-muted-foreground text-lg leading-relaxed">
                 Fini les cahiers froissés. Chaque paiement devient une page animée, chaque mois un
@@ -266,7 +266,7 @@ export default function Index() {
                   { icon: Bell, t: "Notification temps réel à chaque paiement" },
                 ].map(({ icon: Icon, t }) => (
                   <li key={t} className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-primary text-white shrink-0">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shrink-0">
                       <Icon className="h-4 w-4" />
                     </div>
                     <span className="text-foreground/90">{t}</span>
@@ -274,7 +274,7 @@ export default function Index() {
                 ))}
               </ul>
 
-              <Button asChild size="lg" className="gradient-primary border-0 shadow-glow">
+              <Button asChild size="lg" className="bg-primary border-0 shadow-glow text-primary-foreground hover:bg-primary/90">
                 <Link to="/auth">Découvrir mon carnet <ArrowRight className="ml-1 h-4 w-4" /></Link>
               </Button>
             </div>
@@ -288,7 +288,7 @@ export default function Index() {
           <div className="space-y-6">
             <Badge variant="outline" className="border-gold/40 text-gold">Sécurité maximale</Badge>
             <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight">
-              Chaque centime, <span className="text-gradient-gold">protégé.</span>
+              Chaque centime, <span className="text-gold">protégé.</span>
             </h2>
             <p className="text-muted-foreground text-lg leading-relaxed">
               Authentification par rôle, RLS au niveau base de données, traçabilité complète.
@@ -310,7 +310,7 @@ export default function Index() {
             transition={{ duration: 0.7 }}
             className="relative"
           >
-            <div className="absolute -inset-8 bg-gradient-to-br from-gold/30 via-primary/20 to-transparent blur-3xl" />
+            <div className="absolute -inset-8 bg-gold/15 blur-3xl" />
             <div className="relative rounded-3xl overflow-hidden border border-border/40 shadow-elegant ring-glow">
               <img
                 src={heroSecurity}
@@ -330,7 +330,7 @@ export default function Index() {
         <div className="text-center max-w-2xl mx-auto mb-12">
           <Badge variant="outline" className="border-primary/40 text-primary mb-4">Avis clients</Badge>
           <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight">
-            Ils ont <span className="text-gradient">transformé</span> leur collecte.
+            Ils ont <span className="text-primary">transformé</span> leur collecte.
           </h2>
         </div>
 
@@ -353,7 +353,7 @@ export default function Index() {
               </div>
               <p className="text-foreground/90 leading-relaxed mb-4">"{t.text}"</p>
               <div className="flex items-center gap-3 pt-4 border-t border-border/40">
-                <div className="h-10 w-10 rounded-full gradient-primary flex items-center justify-center text-white font-bold">
+                <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
                   {t.name[0]}
                 </div>
                 <div>
@@ -368,7 +368,7 @@ export default function Index() {
 
       {/* CTA */}
       <section className="container mx-auto pb-24">
-        <div className="relative rounded-3xl overflow-hidden gradient-primary shadow-elegant">
+        <div className="relative rounded-3xl overflow-hidden bg-primary shadow-elegant">
           <div className="absolute inset-0 grid-pattern opacity-20" />
           <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/20 blur-3xl" />
           <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
@@ -414,7 +414,7 @@ function FeatureCard({
     >
       <Card className="h-full glass border-border/40 hover:border-primary/40 hover:shadow-glow transition-all group">
         <CardContent className="p-6 space-y-4">
-          <div className={`inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} text-white shadow-lg group-hover:scale-110 transition-transform`}>
+          <div className={`inline-flex h-12 w-12 items-center justify-center rounded-xl ${gradient} text-white shadow-lg group-hover:scale-110 transition-transform`}>
             <Icon className="h-6 w-6" />
           </div>
           <div>
@@ -433,7 +433,7 @@ function SecurityCard({
 }: { icon: React.ComponentType<{ className?: string }>; title: string; text: string }) {
   return (
     <div className="glass rounded-xl p-4 hover:border-gold/40 transition-colors">
-      <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-gold text-foreground shadow-md mb-3">
+      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold text-gold-foreground shadow-md mb-3">
         <Icon className="h-4 w-4" />
       </div>
       <h3 className="font-semibold text-sm mb-1">{title}</h3>

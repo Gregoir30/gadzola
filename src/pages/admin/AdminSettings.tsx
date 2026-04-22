@@ -160,7 +160,7 @@ export default function AdminSettings() {
                   </div>
                   {theme === "dark" && <Check className="h-5 w-5 text-primary" />}
                 </div>
-                <div className="h-12 rounded-lg bg-gradient-to-r from-slate-900 via-violet-950 to-slate-900" />
+                <div className="h-12 rounded-lg bg-slate-900" />
               </button>
 
               <button
@@ -183,7 +183,7 @@ export default function AdminSettings() {
                   </div>
                   {theme === "light" && <Check className="h-5 w-5 text-primary" />}
                 </div>
-                <div className="h-12 rounded-lg bg-gradient-to-r from-white via-violet-100 to-white border border-border" />
+                <div className="h-12 rounded-lg bg-white border border-border" />
               </button>
             </div>
           </CardContent>
@@ -357,7 +357,7 @@ export default function AdminSettings() {
               >
                 Annuler
               </Button>
-              <Button onClick={handleSave} disabled={saving} className="gradient-primary text-white">
+              <Button onClick={handleSave} disabled={saving} className="bg-primary text-primary-foreground hover:bg-primary/90">
                 {saving ? "Sauvegarde…" : "Enregistrer"}
               </Button>
             </div>
