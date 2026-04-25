@@ -1,37 +1,174 @@
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Smartphone, QrCode, Loader2, Sparkles } from "lucide-react";
+import { Smartphone, QrCode, Loader2, Sparkles, Waves, WalletCards } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
-const providers = [
-  { name: "Orange Money", color: "bg-[#FF7900]", initials: "OM" },
-  { name: "MTN Mobile Money", color: "bg-[#FFCB05] text-foreground", initials: "MTN" },
-  { name: "Wave", color: "bg-[#1DC8FF]", initials: "W" },
-  { name: "Moov Money", color: "bg-[#0066B3]", initials: "MM" },
+// Import logos
+import moovLogo from "@/assets/paiement/moov.png";
+import mixxByYasLogo from "@/assets/paiement/mixx-by-yas.svg";
+
+declare global {
+  interface Window {
+    FedaPay: any;
+  }
+}
+
+type PaymentMethod = "mobile_money_mtn" | "mobile_money_moov" | "mobile_money_orange" | "mobile_money_wave";
+
+const PAYMENT_OPTIONS: Array<{
+  value: PaymentMethod;
+  label: string;
+  helper: string;
+  logoSrc?: string;
+  icon?: typeof WalletCards;
+  badgeClass: string;
+}> = [
+  {
+    value: "mobile_money_mtn",
+    label: "Mixx by Yas",
+    helper: "Togocom / Yas",
+    logoSrc: mixxByYasLogo,
+    badgeClass: "bg-[#ff6a13]/10 text-[#ff6a13] border-[#ff6a13]/20",
+  },
+  {
+    value: "mobile_money_moov",
+    label: "Moov Money",
+    helper: "Moov Africa",
+    logoSrc: moovLogo,
+    badgeClass: "bg-[#0b8f74]/10 text-[#0b8f74] border-[#0b8f74]/20",
+  },
+  {
+    value: "mobile_money_orange",
+    label: "Orange Money",
+    helper: "Compte Orange Money",
+    icon: WalletCards,
+    badgeClass: "bg-[#ff7900]/10 text-[#ff7900] border-[#ff7900]/20",
+  },
+  {
+    value: "mobile_money_wave",
+    label: "Wave",
+    helper: "Paiement mobile Wave",
+    icon: Waves,
+    badgeClass: "bg-[#1f6bff]/10 text-[#1f6bff] border-[#1f6bff]/20",
+  },
 ];
 
 export default function ClientPayer() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [clientId, setClientId] = useState<string | null>(null);
+  const [clientData, setClientData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [amount, setAmount] = useState<string>("");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     if (user) {
       void (async () => {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from("clients")
-          .select("id")
+          .select("id, full_name, phone")
           .eq("profile_id", user.id)
           .single();
-        if (data) setClientId(data.id);
+        if (error) {
+          console.error("Erreur chargement client pour QR:", error);
+        }
+        if (data) {
+          setClientId(data.id);
+          setClientData({
+            ...data,
+            email: profile?.email ?? user.email ?? null,
+          });
+        }
         setLoading(false);
       })();
+    } else {
+      setLoading(false);
     }
-  }, [user]);
+  }, [user, profile]);
+
+  const handlePayment = (method: PaymentMethod) => {
+    if (!amount || isNaN(Number(amount)) || Number(amount) < 100) {
+      toast.error("Veuillez entrer un montant valide (minimum 100 FCFA).");
+      return;
+    }
+
+    if (!window.FedaPay) {
+      toast.error("Le module de paiement n'est pas chargé. Veuillez rafraîchir la page.");
+      return;
+    }
+
+    const fedapayKey = import.meta.env.VITE_FEDAPAY_PUBLIC_KEY;
+    if (!fedapayKey) {
+      toast.error("Configuration FedaPay manquante.");
+      return;
+    }
+
+    setIsProcessing(true);
+
+    const selectedMethod = PAYMENT_OPTIONS.find((option) => option.value === method);
+    const methodLabel = selectedMethod?.label ?? "Mobile Money";
+
+    const names = clientData?.full_name?.split(" ") || ["Client", ""];
+    const firstname = names[0];
+    const lastname = names.slice(1).join(" ") || "Gadzola";
+
+    const widget = window.FedaPay.init({
+      public_key: fedapayKey,
+      transaction: {
+        amount: Number(amount),
+        description: `Paiement Gadzola - ${clientData?.full_name || "Client"} - ${methodLabel}`,
+      },
+      customer: {
+        email: clientData?.email || "client@gadzola.com",
+        lastname: lastname,
+        firstname: firstname,
+        phone_number: {
+          number: clientData?.phone || "",
+          country: "tg" // "tg" pour Togo ou "bj" pour Bénin
+        }
+      },
+      onComplete: async (resp: any) => {
+        const reason = resp.reason;
+        setIsProcessing(false);
+
+        if (reason === window.FedaPay.DIALOG_DISMISSED) {
+          toast.info("Paiement annulé.");
+        } else {
+          toast.info("Validation du paiement en cours...");
+          
+          // Appeler l'Edge Function pour vérifier et enregistrer la transaction
+          try {
+            const { data, error } = await supabase.functions.invoke("verify-fedapay-transaction", {
+              body: { 
+                transactionId: resp.transaction.id,
+                clientId: clientId,
+                method,
+                amount: Number(amount)
+              }
+            });
+
+            if (error) throw error;
+            
+            toast.success("Paiement réussi et enregistré !");
+            setAmount("");
+          } catch (err) {
+            console.error("Erreur vérification FedaPay:", err);
+            toast.error("Le paiement a réussi mais l'enregistrement a échoué. Veuillez contacter le support.");
+          }
+        }
+      }
+    });
+
+    widget.open();
+  };
+
   return (
     <AppShell>
       <div className="space-y-6 max-w-3xl">
@@ -107,28 +244,60 @@ export default function ClientPayer() {
               <Smartphone className="h-4 w-4" /> Paiement Mobile Money
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             <p className="text-sm text-muted-foreground">
-              L'intégration Mobile Money sera bientôt disponible. Pour l'instant, présentez-vous
-              à votre collecteur avec votre paiement (espèces ou Mobile Money) — il enregistrera
-              la transaction et vous recevrez une notification WhatsApp instantanée.
+              Entrez le montant et choisissez votre méthode de paiement pour recharger votre compte.
             </p>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-              {providers.map((p) => (
-                <div
-                  key={p.name}
-                  className="flex flex-col items-center gap-2 rounded-lg border bg-card p-4 opacity-70"
-                >
-                  <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-full text-white font-bold text-sm ${p.color}`}
-                  >
-                    {p.initials}
-                  </div>
-                  <span className="text-xs text-center font-medium">{p.name}</span>
-                  <span className="text-[10px] text-muted-foreground">Bientôt</span>
-                </div>
-              ))}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Montant (FCFA)</label>
+                <Input 
+                  type="number" 
+                  placeholder="Ex: 5000" 
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="text-lg"
+                  min="100"
+                />
+              </div>
+
+              <div className="grid gap-4 pt-2 sm:grid-cols-2">
+                {PAYMENT_OPTIONS.map((option) => {
+                  const Icon = option.icon;
+
+                  return (
+                    <Button
+                      key={option.value}
+                      variant="outline"
+                      className="h-auto min-h-32 justify-start rounded-2xl border-2 px-4 py-4 text-left hover:border-primary hover:bg-primary/5 transition-all"
+                      onClick={() => handlePayment(option.value)}
+                      disabled={isProcessing}
+                    >
+                      <div className="flex w-full items-center gap-4">
+                        <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border ${option.badgeClass}`}>
+                          {option.logoSrc ? (
+                            <img src={option.logoSrc} alt={option.label} className="h-9 w-9 object-contain" />
+                          ) : Icon ? (
+                            <Icon className="h-7 w-7" />
+                          ) : null}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-semibold leading-tight">{option.label}</p>
+                          <p className="text-xs text-muted-foreground">{option.helper}</p>
+                        </div>
+                      </div>
+                    </Button>
+                  );
+                })}
+              </div>
+
+              <div className="rounded-2xl border border-dashed border-primary/30 bg-primary/5 px-4 py-3">
+                <p className="text-xs text-muted-foreground">
+                  Le parcours de paiement est ouvert via FedaPay. La disponibilite des reseaux peut varier selon
+                  votre numero, votre operateur et la configuration active de votre compte marchand.
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -137,10 +306,10 @@ export default function ClientPayer() {
           <CardContent className="p-5">
             <h3 className="font-semibold mb-2">💡 Comment ça marche aujourd'hui</h3>
             <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-              <li>Remettez votre paiement à votre collecteur (cash ou Mobile Money manuel).</li>
-              <li>Le collecteur enregistre la transaction sur Gadzola.</li>
-              <li>Vous recevez une notification WhatsApp avec la référence et le montant.</li>
-              <li>L'historique est consultable à tout moment dans « Mes paiements ».</li>
+              <li>Entrez le montant que vous souhaitez payer.</li>
+              <li>Choisissez Mixx by Yas, Moov Money, Orange Money ou Wave.</li>
+              <li>Validez le paiement sur votre téléphone.</li>
+              <li>La transaction sera enregistrée automatiquement.</li>
             </ol>
           </CardContent>
         </Card>
